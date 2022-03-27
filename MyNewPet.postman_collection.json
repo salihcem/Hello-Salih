@@ -1,0 +1,315 @@
+{
+	"info": {
+		"_postman_id": "cc012c43-2934-4f05-a499-f8b44fd4cf67",
+		"name": "MyNewPet",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "New Pet: POST",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// SET VARIABLES:",
+							"var jsonData = JSON.parse(responseBody.replace(/([^\"\\w-])([-0-9.]{8,100})([^\"\\w-])/g, '$1\\\"$2\\\"$3'));",
+							"pm.environment.set(\"PetID\", jsonData.id);",
+							"",
+							"//ASSERTIONS:",
+							"pm.test(\"Response status is 200 OK\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time should be less than 1000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});",
+							"",
+							"pm.test(\"Response has valid JSON body\", function() {",
+							"    pm.response.to.be.withBody;",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Response body contains 'status:available'\", function() {",
+							"    pm.expect(jsonData.status).to.equal('available');",
+							"",
+							"});",
+							"",
+							"// NEXT REQUEST:",
+							"console.log(jsonData.id)",
+							"console.log(\"Jumping to Update Pet: PUT\");",
+							"postman.setNextRequest(\"Update Pet: PUT\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const myPetName = pm.variables.replaceIn('{{$randomFirstName}}');",
+							"postman.setEnvironmentVariable(\"PetName\", myPetName);",
+							"var data = request.data.replace('{{PetName}}', postman.getEnvironmentVariable(\"PetName\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": 0,\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"name\": \"{{PetName}}\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"available\"\n}"
+				},
+				"url": {
+					"raw": "https://petstore.swagger.io/v2/pet",
+					"protocol": "https",
+					"host": [
+						"petstore",
+						"swagger",
+						"io"
+					],
+					"path": [
+						"v2",
+						"pet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Pet: PUT",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var data = request.data.replace('{{PetID}}', postman.getEnvironmentVariable(\"PetID\"));",
+							"data = request.data.replace('{{PetName}}', pm.environment.get(\"PetName\"));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// SET VARIABLES:",
+							"var jsonData = JSON.parse(responseBody.replace(/([^\"\\w-])([-0-9.]{8,100})([^\"\\w-])/g, '$1\\\"$2\\\"$3'));",
+							"",
+							"//ASSERTIONS:",
+							"pm.test(\"Response status is 200 OK\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time should be less than 1000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});",
+							"",
+							"pm.test(\"Response has valid JSON body\", function() {",
+							"    pm.response.to.be.withBody;",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Response body contains '_updated' suffix\", function() {",
+							"    pm.expect(jsonData.name).to.equal(pm.environment.get('PetName')+'_updated');",
+							"});",
+							"",
+							"// NEXT REQUEST:",
+							"console.log(\"Jumping to Get Pet: GET\");",
+							"postman.setNextRequest(\"Get Pet: GET\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": {{PetID}},\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"name\": \"{{PetName}}_updated\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"available\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://petstore.swagger.io/v2/pet",
+					"protocol": "https",
+					"host": [
+						"petstore",
+						"swagger",
+						"io"
+					],
+					"path": [
+						"v2",
+						"pet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Pet: GET",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// SET VARIABLES:",
+							"var jsonData = JSON.parse(responseBody.replace(/([^\"\\w-])([-0-9.]{8,100})([^\"\\w-])/g, '$1\\\"$2\\\"$3'));",
+							"",
+							"//ASSERTIONS:",
+							"pm.test(\"Response status is 200 OK\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time should be less than 1000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});",
+							"",
+							"pm.test(\"Response has valid JSON body\", function() {",
+							"    pm.response.to.be.withBody;",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Response body contains '_updated' suffix\", function() {",
+							"    pm.expect(jsonData.name).to.equal(pm.environment.get('PetName')+'_updated');",
+							"});",
+							"",
+							"// NEXT REQUEST:",
+							"console.log(\"Jumping to Delete Pet: DELETE\");",
+							"postman.setNextRequest(\"Delete Pet: DELETE\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://petstore.swagger.io/v2/pet/{{PetID}}",
+					"protocol": "https",
+					"host": [
+						"petstore",
+						"swagger",
+						"io"
+					],
+					"path": [
+						"v2",
+						"pet",
+						"{{PetID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Pet: DELETE",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// SET VARIABLES:",
+							"var jsonData = JSON.parse(responseBody.replace(/([^\"\\w-])([-0-9.]{8,100})([^\"\\w-])/g, '$1\\\"$2\\\"$3'));",
+							"",
+							"//ASSERTIONS:",
+							"pm.test(\"Response status is 200 OK\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time should be less than 1000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});",
+							"",
+							"pm.test(\"Response has valid JSON body\", function() {",
+							"    pm.response.to.be.withBody;",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Response body contains 'type:unknown\", function() {",
+							"    pm.expect(jsonData.type).to.equal('unknown');",
+							"});",
+							"",
+							"pm.test(\"Response body contains deleted Id\", function() {",
+							"    pm.expect(jsonData.message).to.equal(pm.environment.get('PetID'));",
+							"});",
+							"",
+							"// NEXT REQUEST:",
+							"console.log(\"Jumping to Delete Pet: DELETE\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://petstore.swagger.io/v2/pet/{{PetID}}",
+					"protocol": "https",
+					"host": [
+						"petstore",
+						"swagger",
+						"io"
+					],
+					"path": [
+						"v2",
+						"pet",
+						"{{PetID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
